@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozi Cafe</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lato', sans-serif; background: #fef9f3; color: #2c1a0e; }
+
+/* NAV */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 70px;
+  background: rgba(254,249,243,0.97);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 50px;
+  border-bottom: 1px solid #eddfc8;
+  z-index: 999;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #2c1a0e; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; }
+.logo span { color: #c8933a; }
+.nav-links { display: flex; gap: 10px; list-style: none; }
+.nav-links button { background: none; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #5a3a22; cursor: pointer; padding: 8px 16px; border-radius: 2px; transition: color 0.2s, background 0.2s; }
+.nav-links button:hover, .nav-links button.active { color: #c8933a; background: #fdf0da; }
+.nav-reserve { background: #2c1a0e !important; color: #fff !important; }
+.nav-reserve:hover { background: #c8933a !important; color: #fff !important; }
+.hamburger { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: #2c1a0e; }
+
+#mobile-nav { display: none; position: fixed; top: 70px; left: 0; right: 0; background: #fef9f3; padding: 20px; border-bottom: 2px solid #c8933a; z-index: 998; flex-direction: column; gap: 4px; }
+#mobile-nav button { background: none; border: none; font-family: 'Lato', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #2c1a0e; cursor: pointer; padding: 14px; text-align: left; border-bottom: 1px solid #eddfc8; }
+
+.page { display: none; padding-top: 70px; }
+.page.show { display: block; }
+
+/* HERO */
+.hero { position: relative; height: calc(100vh - 70px); min-height: 500px; overflow: hidden; }
+.hero-slider { position: absolute; inset: 0; }
+.slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
+.slide.on { opacity: 1; }
+.slide img { width: 100%; height: 100%; object-fit: cover; }
+.slide::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,8,2,0.85) 0%, rgba(20,8,2,0.3) 60%, transparent 100%); }
+.hero-text { position: absolute; bottom: 80px; left: 60px; z-index: 2; max-width: 620px; }
+.hero-badge { display: inline-block; background: rgba(200,147,58,0.9); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; }
+.hero-title { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 66px); font-weight: 700; color: #fff; line-height: 1.1; margin-bottom: 12px; }
+.hero-title em { font-style: italic; color: #e8c07a; }
+.hero-sub { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; font-weight: 300; }
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.btn-gold { background: #c8933a; color: #fff; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 14px 34px; cursor: pointer; transition: background 0.2s, transform 0.2s; border-radius: 2px; }
+.btn-gold:hover { background: #a07228; transform: translateY(-2px); }
+.btn-white { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.5); font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px 32px; cursor: pointer; transition: background 0.2s; border-radius: 2px; }
+.btn-white:hover { background: rgba(255,255,255,0.15); }
+.hero-dots { position: absolute; bottom: 30px; right: 60px; z-index: 3; display: flex; gap: 10px; }
+.dot { width: 30px; height: 3px; background: rgba(255,255,255,0.3); cursor: pointer; transition: background 0.3s, width 0.3s; border-radius: 2px; }
+.dot.on { background: #c8933a; width: 48px; }
+
+/* TICKER */
+.ticker { background: #1a0f06; padding: 13px 0; overflow: hidden; white-space: nowrap; }
+.ticker-inner { display: inline-flex; gap: 60px; animation: tick 20s linear infinite; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #e8c07a; }
+.ticker-inner span::before { content: '✦  '; color: #c8933a; }
+@keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* STORY */
+.story { display: grid; grid-template-columns: 1fr 1fr; min-height: 560px; }
+.story-img { overflow: hidden; position: relative; }
+.story-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+.story-img:hover img { transform: scale(1.05); }
+.story-badge { position: absolute; bottom: 28px; left: 28px; background: #c8933a; color: #fff; padding: 14px 18px; text-align: center; }
+.story-badge .yr { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; display: block; line-height: 1; }
+.story-badge .lb { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+.story-text { padding: 72px 64px; background: #fff; display: flex; flex-direction: column; justify-content: center; }
+.label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c8933a; margin-bottom: 12px; }
+.title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 3.5vw, 46px); font-weight: 700; color: #2c1a0e; line-height: 1.2; margin-bottom: 18px; }
+.title em { font-style: italic; color: #c8933a; }
+.body-text { font-size: 15px; line-height: 1.9; color: #7a5038; margin-bottom: 28px; }
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+.stat { background: #fdf0da; padding: 18px; text-align: center; border-radius: 2px; }
+.stat-n { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: #c8933a; display: block; }
+.stat-l { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #7a5038; }
+.btn-dark { background: #2c1a0e; color: #fff; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 13px 32px; cursor: pointer; width: fit-content; transition: background 0.2s, transform 0.2s; border-radius: 2px; }
+.btn-dark:hover { background: #c8933a; transform: translateY(-2px); }
+
+/* BANNER */
+.banner { position: relative; height: 420px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.banner::after { content: ''; position: absolute; inset: 0; background: rgba(16,6,2,0.62); }
+.banner-text { position: relative; z-index: 2; text-align: center; padding: 0 40px; }
+.banner-quote { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 52px); font-style: italic; color: #fff; line-height: 1.4; margin-bottom: 24px; }
+.banner-quote em { color: #e8c07a; }
+
+/* MENU SECTION */
+.menu-sec { padding: 90px 60px; background: #fdf6ec; text-align: center; }
+.menu-sec .title, .menu-sec .body-text { margin-left: auto; margin-right: auto; }
+.menu-sec .body-text { max-width: 540px; }
+.tabs { display: flex; justify-content: center; gap: 4px; background: #eddfc8; padding: 5px; border-radius: 4px; width: fit-content; margin: 32px auto 40px; }
+.tab { background: transparent; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 9px 22px; border-radius: 2px; cursor: pointer; color: #7a5038; transition: all 0.2s; }
+.tab.on { background: #2c1a0e; color: #fff; }
+.tab:hover:not(.on) { color: #c8933a; }
+.tab-panel { display: none; }
+.tab-panel.on { display: block; }
+
+/* CARDS */
+.cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.card { background: #fff; border-radius: 4px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 16px rgba(0,0,0,0.06); transition: transform 0.3s, box-shadow 0.3s; }
+.card:hover { transform: translateY(-10px); box-shadow: 0 20px 48px rgba(44,26,14,0.14); }
+.card-img { height: 240px; overflow: hidden; position: relative; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.card:hover .card-img img { transform: scale(1.08); }
+.card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,8,2,0.75), transparent 50%); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 20px; color: #fff; font-size: 13px; line-height: 1.5; }
+.card:hover .card-overlay { opacity: 1; }
+.card-foot { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; border-top: 2px solid #fdf6ec; }
+.card-lbl { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #2c1a0e; }
+.card-arr { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #eddfc8; display: flex; align-items: center; justify-content: center; color: #c8933a; font-size: 14px; transition: all 0.2s; }
+.card:hover .card-arr { background: #c8933a; color: #fff; border-color: #c8933a; transform: rotate(-45deg); }
+
+/* GALLERY */
+.gallery { display: grid; grid-template-columns: repeat(4,1fr); height: 300px; gap: 3px; }
+.gal-item { overflow: hidden; position: relative; cursor: pointer; }
+.gal-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.gal-item:hover img { transform: scale(1.1); }
+.gal-item::after { content: ''; position: absolute; inset: 0; background: rgba(20,8,2,0); transition: background 0.3s; }
+.gal-item:hover::after { background: rgba(20,8,2,0.3); }
+
+/* CRAFT */
+.craft { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; }
+.craft-dark { background: #1a0f06; padding: 72px 64px; display: flex; flex-direction: column; justify-content: center; }
+.craft-dark .label { color: #e8c07a; }
+.craft-dark .title { color: #fff; }
+.craft-dark .body-text { color: rgba(255,255,255,0.65); margin-bottom: 20px; }
+.craft-feats { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.feat { display: flex; gap: 14px; align-items: flex-start; }
+.feat-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(200,147,58,0.2); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.feat strong { display: block; font-size: 13px; color: #fff; margin-bottom: 2px; }
+.feat span { font-size: 12px; color: rgba(255,255,255,0.5); }
+.btn-outline-w { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.4); font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 13px 32px; cursor: pointer; width: fit-content; transition: all 0.2s; border-radius: 2px; }
+.btn-outline-w:hover { background: #fff; color: #2c1a0e; }
+.craft-img { overflow: hidden; }
+.craft-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+.craft-img:hover img { transform: scale(1.05); }
+
+/* TESTIMONIALS */
+.testi-sec { padding: 90px 60px; background: #f7edd8; text-align: center; }
+.testi-sec .title { margin-bottom: 44px; }
+.testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.testi { background: #fff; padding: 32px 28px; border-radius: 4px; text-align: left; box-shadow: 0 2px 12px rgba(0,0,0,0.05); transition: transform 0.3s; }
+.testi:hover { transform: translateY(-6px); }
+.stars { color: #c8933a; font-size: 14px; letter-spacing: 3px; margin-bottom: 14px; }
+.testi-q { font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; color: #5a3a22; line-height: 1.7; margin-bottom: 20px; }
+.testi-who { display: flex; align-items: center; gap: 12px; }
+.testi-av { width: 40px; height: 40px; border-radius: 50%; background: #c8933a; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+.testi-name { font-size: 13px; font-weight: 700; color: #2c1a0e; display: block; }
+.testi-role { font-size: 11px; color: #7a5038; }
+
+.ticker-warm { background: #c8933a; padding: 13px 0; overflow: hidden; white-space: nowrap; }
+.ticker-warm .ticker-inner { color: rgba(255,255,255,0.95); }
+.ticker-warm .ticker-inner span::before { color: rgba(255,255,255,0.6); }
+
+/* PAGE BANNER */
+.page-banner { position: relative; height: 360px; overflow: hidden; display: flex; align-items: flex-end; }
+.page-banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.page-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,8,2,0.85), rgba(20,8,2,0.2)); }
+.page-banner-inner { position: relative; z-index: 2; padding: 0 60px 50px; }
+.page-banner-inner .label { color: #e8c07a; }
+.page-banner-inner h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 58px); font-weight: 700; color: #fff; line-height: 1.15; }
+.page-banner-inner h1 em { font-style: italic; color: #e8c07a; }
+
+/* MENU BODY */
+.menu-body { padding: 70px 60px; }
+.menu-tabs { display: flex; gap: 4px; background: #eddfc8; padding: 5px; border-radius: 4px; width: fit-content; margin-bottom: 40px; }
+.mtab { background: transparent; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 9px 26px; border-radius: 2px; cursor: pointer; color: #7a5038; transition: all 0.2s; }
+.mtab.on { background: #2c1a0e; color: #fff; }
+.mtab:hover:not(.on) { color: #c8933a; }
+.mpanel { display: none; }
+.mpanel.on { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+
+/* MENU ITEMS */
+.mi { background: #fff; border-radius: 4px; padding: 20px 22px; display: flex; gap: 16px; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s; }
+.mi:hover { transform: translateX(5px); }
+.mi img { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+.mi-info { flex: 1; }
+.mi-name { font-size: 15px; font-weight: 700; color: #2c1a0e; margin-bottom: 4px; }
+.mi-desc { font-size: 12px; color: #7a5038; line-height: 1.6; }
+.mi-tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+.mi-tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; background: #fdf0da; color: #7a5038; }
+.mi-price { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #c8933a; flex-shrink: 0; margin-left: auto; }
+
+/* ABOUT */
+.about-intro { display: grid; grid-template-columns: 1fr 1fr; min-height: 540px; }
+.about-img { overflow: hidden; }
+.about-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s; }
+.about-img:hover img { transform: scale(1.05); }
+.about-text { padding: 72px 64px; background: #fff; display: flex; flex-direction: column; justify-content: center; }
+.values-sec { padding: 90px 60px; background: #fdf6ec; }
+.v-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 48px; }
+.v-card { background: #fff; padding: 40px 32px; border-radius: 4px; border-bottom: 3px solid transparent; box-shadow: 0 2px 12px rgba(0,0,0,0.05); transition: border-color 0.3s, transform 0.3s; }
+.v-card:hover { border-color: #c8933a; transform: translateY(-6px); }
+.v-icon { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #c8933a, #e8c07a); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; }
+.v-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: #2c1a0e; margin-bottom: 10px; }
+.v-desc { font-size: 14px; line-height: 1.8; color: #7a5038; }
+.team-sec { padding: 90px 60px; background: #f7edd8; text-align: center; }
+.team-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 48px; }
+.t-card { text-align: center; }
+.t-avatar { width: 120px; height: 120px; border-radius: 50%; background: #c8933a; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; margin: 0 auto 16px; border: 4px solid #eddfc8; }
+.t-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #2c1a0e; margin-bottom: 4px; }
+.t-role { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c8933a; margin-bottom: 10px; }
+.t-bio { font-size: 13px; line-height: 1.7; color: #7a5038; }
+
+/* CONTACT */
+.contact-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 70px); }
+.contact-img-col { position: relative; overflow: hidden; }
+.contact-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.contact-img-col::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(20,8,2,0.5), transparent); }
+.contact-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 48px; z-index: 2; background: linear-gradient(to top, rgba(20,8,2,0.85), transparent); }
+.info-box { display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 14px 18px; border-radius: 4px; color: #fff; margin-bottom: 12px; }
+.info-box-icon { font-size: 18px; flex-shrink: 0; }
+.info-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #e8c07a; margin-bottom: 2px; }
+.info-val { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.85); }
+.contact-form-col { background: #fff; padding: 60px 64px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+.c-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 36px; }
+.c-logo-mark { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg,#c8933a,#e8c07a); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.c-logo-text { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #2c1a0e; }
+.cform { display: flex; flex-direction: column; gap: 14px; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ff { display: flex; flex-direction: column; gap: 5px; }
+.ff label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #5a3a22; }
+.ff input, .ff textarea, .ff select { border: 1.5px solid #eddfc8; background: #fef9f3; padding: 12px 14px; font-family: 'Lato', sans-serif; font-size: 14px; color: #2c1a0e; border-radius: 2px; outline: none; transition: border-color 0.2s; resize: none; }
+.ff input:focus, .ff textarea:focus, .ff select:focus { border-color: #c8933a; background: #fff; }
+.ff textarea { height: 100px; }
+.submit-btn { background: #2c1a0e; color: #fff; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; padding: 16px; border-radius: 2px; cursor: pointer; margin-top: 4px; transition: background 0.2s; }
+.submit-btn:hover { background: #c8933a; }
+.form-success { display: none; text-align: center; padding: 40px 24px; background: #fdf0da; border-radius: 4px; margin-top: 14px; }
+.form-success p { font-size: 15px; color: #5a3a22; line-height: 1.8; margin-top: 10px; }
+
+/* FOOTER */
+.footer-top { background: #1a0f06; padding: 64px 60px 36px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+.f-brand .f-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #e8c07a; margin-bottom: 14px; }
+.f-brand p { font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.4); margin-bottom: 20px; max-width: 260px; }
+.f-social { display: flex; gap: 10px; }
+.f-social a { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.45); font-size: 14px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+.f-social a:hover { background: #c8933a; border-color: #c8933a; color: #fff; transform: translateY(-3px); }
+.f-col h4 { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #e8c07a; margin-bottom: 18px; }
+.f-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.f-col ul li button { background: none; border: none; font-family: 'Lato', sans-serif; font-size: 13px; color: rgba(255,255,255,0.4); cursor: pointer; text-align: left; transition: color 0.2s, padding-left 0.2s; padding: 0; }
+.f-col ul li button:hover { color: #e8c07a; padding-left: 6px; }
+.f-hrs { display: flex; flex-direction: column; gap: 8px; }
+.f-hr { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.f-day { color: rgba(255,255,255,0.4); }
+.f-time { color: rgba(255,255,255,0.7); font-weight: 700; }
+.footer-bar { background: #100704; padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.05); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+
+/* FLOAT BTN */
+#float-btn { position: fixed; bottom: 28px; right: 28px; z-index: 500; background: #c8933a; color: #fff; border: none; font-family: 'Lato', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 13px 26px; border-radius: 30px; cursor: pointer; box-shadow: 0 8px 28px rgba(200,147,58,0.5); opacity: 0; transform: translateY(16px); transition: opacity 0.3s, transform 0.3s, background 0.2s; display: flex; align-items: center; gap: 9px; }
+#float-btn.show { opacity: 1; transform: translateY(0); }
+#float-btn:hover { background: #2c1a0e; transform: translateY(-3px) scale(1.03); }
+#float-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: bl 1.4s infinite; }
+@keyframes bl { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  #nav { padding: 0 20px; }
+  .nav-links, .nav-reserve { display: none; }
+  .hamburger { display: block; }
+  .hero-text { left: 24px; bottom: 60px; }
+  .hero-dots { right: 24px; }
+  .story, .craft, .about-intro, .contact-wrap { grid-template-columns: 1fr; }
+  .story-img, .craft-img, .about-img, .contact-img-col { height: 300px; }
+  .story-text, .craft-dark, .about-text, .contact-form-col { padding: 48px 24px; }
+  .menu-sec, .testi-sec, .values-sec, .team-sec, .menu-body { padding: 60px 24px; }
+  .cards, .testi-grid, .v-grid, .team-grid { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: 1fr 1fr; height: auto; }
+  .gal-item { height: 160px; }
+  .mpanel.on { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr 1fr; padding: 48px 24px 28px; }
+  .footer-bar { flex-direction: column; gap: 10px; text-align: center; padding: 16px 24px; }
+  .page-banner-inner { padding: 0 24px 40px; }
+  .contact-img-col { height: 280px; }
+  .contact-overlay { padding: 20px 24px; }
+}
+</style>
+</head>
+<body>
+
+<button id="float-btn" onclick="go('contact')"><span class="dot"></span>Reserve a Table</button>
+
+<div id="mobile-nav">
+  <button onclick="go('home');closeMob()">Home</button>
+  <button onclick="go('menu');closeMob()">Menu</button>
+  <button onclick="go('about');closeMob()">About</button>
+  <button onclick="go('contact');closeMob()">Contact</button>
+</div>
+
+<nav id="nav">
+  <div class="logo" onclick="go('home')">☕ <span>Cozi</span> Cafe</div>
+  <ul class="nav-links">
+    <li><button id="n-home" class="active" onclick="go('home')">Home</button></li>
+    <li><button id="n-menu" onclick="go('menu')">Menu</button></li>
+    <li><button id="n-about" onclick="go('about')">About</button></li>
+    <li><button id="n-contact" onclick="go('contact')">Contact</button></li>
+    <li><button class="nav-reserve" onclick="go('contact')">Reserve</button></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMob()">☰</button>
+</nav>
+
+<!-- ████ HOME ████ -->
+<div class="page show" id="page-home">
+  <div class="hero">
+    <div class="hero-slider">
+      <div class="slide on"><img src="1773487317149_image.jpg" alt="Baker making croissants"></div>
+      <div class="slide"><img src="1773487287938_image.jpg" alt="Tiramisu"></div>
+      <div class="slide"><img src="1773487211361_image.jpg" alt="Pastry decorating"></div>
+      <div class="slide"><img src="1773487246944_image.jpg" alt="Cakes on plates"></div>
+    </div>
+    <div class="hero-text">
+      <div class="hero-badge">☕ Freshly Baked Every Morning</div>
+      <h1 class="hero-title">Savor Sunshine Mornings<br>with <em>Coffee &amp; Golden Pastry!</em></h1>
+      <p class="hero-sub">Where every cup tells a story, and every bite is a moment of joy.</p>
+      <div class="hero-btns">
+        <button class="btn-gold" onclick="go('menu')">Explore Menu →</button>
+        <button class="btn-white" onclick="go('about')">Our Story →</button>
+      </div>
+    </div>
+    <div class="hero-dots">
+      <div class="dot on" onclick="goslide(0)"></div>
+      <div class="dot" onclick="goslide(1)"></div>
+      <div class="dot" onclick="goslide(2)"></div>
+      <div class="dot" onclick="goslide(3)"></div>
+    </div>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span>Instagram @cozi.cafe</span><span>Use #cozi.cafe to share your moments</span>
+      <span>All-Day Brunch</span><span>Fresh Pastries Daily</span><span>Artisan Coffee</span><span>Open 7 Days</span>
+      <span>Instagram @cozi.cafe</span><span>Use #cozi.cafe to share your moments</span>
+      <span>All-Day Brunch</span><span>Fresh Pastries Daily</span><span>Artisan Coffee</span><span>Open 7 Days</span>
+    </div>
+  </div>
+
+  <div class="story">
+    <div class="story-img">
+      <img src="1773487211361_image.jpg" alt="Pastry being decorated">
+      <div class="story-badge"><span class="yr">2018</span><span class="lb">Est.</span></div>
+    </div>
+    <div class="story-text">
+      <p class="label">Who We Are</p>
+      <h2 class="title">Our Story</h2>
+      <p class="body-text">At The Cozi Cafe, we believe a great coffee experience is about more than just the brew. It's the cozy ambiance, warm hospitality, and delightful treats that accompany each sip — a sanctuary where you can escape the everyday.</p>
+      <div class="stats">
+        <div class="stat"><span class="stat-n">6+</span><span class="stat-l">Years Open</span></div>
+        <div class="stat"><span class="stat-n">200+</span><span class="stat-l">Menu Items</span></div>
+        <div class="stat"><span class="stat-n">4.9★</span><span class="stat-l">Rating</span></div>
+      </div>
+      <button class="btn-dark" onclick="go('about')">About Us →</button>
+    </div>
+  </div>
+
+  <div class="banner">
+    <img src="1773487287938_image.jpg" alt="Tiramisu">
+    <div class="banner-text">
+      <p class="banner-quote">"Crafted with passion — every bite tells a story of <em>love and skill.</em>"</p>
+      <button class="btn-white" onclick="go('menu')">See What's Baking →</button>
+    </div>
+  </div>
+
+  <div class="menu-sec">
+    <p class="label">Our Offerings</p>
+    <h2 class="title">What We Have</h2>
+    <p class="body-text">Crafted with the finest ingredients and a passion for flavour — coffee creations, freshly baked goods, and savoury bites.</p>
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab(this,'t-all')">All</button>
+      <button class="tab" onclick="switchTab(this,'t-pastry')">Pastries</button>
+      <button class="tab" onclick="switchTab(this,'t-coffee')">Coffee</button>
+      <button class="tab" onclick="switchTab(this,'t-brunch')">Brunch</button>
+    </div>
+    <div id="t-all" class="tab-panel on">
+      <div class="cards">
+        <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487317149_image.jpg" alt="Brunch"><div class="card-overlay">Hand-laminated pastries, baked golden every morning</div></div><div class="card-foot"><span class="card-lbl">All-Day Brunch</span><div class="card-arr">→</div></div></div>
+        <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487246944_image.jpg" alt="Sweets"><div class="card-overlay">Seasonal cakes and sweets made from scratch daily</div></div><div class="card-foot"><span class="card-lbl">Pastries &amp; Sweets</span><div class="card-arr">→</div></div></div>
+        <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487223215_image.jpg" alt="Coffee"><div class="card-overlay">Single-origin beans, expertly brewed to order</div></div><div class="card-foot"><span class="card-lbl">Coffee &amp; Drinks</span><div class="card-arr">→</div></div></div>
+      </div>
+    </div>
+    <div id="t-pastry" class="tab-panel"><div class="cards">
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487211361_image.jpg" alt="Tarts"></div><div class="card-foot"><span class="card-lbl">Cream Tarts</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487223215_image.jpg" alt="Danish"></div><div class="card-foot"><span class="card-lbl">Caramel Danish</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="1773487287938_image.jpg" alt="Tiramisu"></div><div class="card-foot"><span class="card-lbl">Tiramisu</span><div class="card-arr">→</div></div></div>
+    </div></div>
+    <div id="t-coffee" class="tab-panel"><div class="cards">
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="coffee_flatwhite.jpg" alt="Flat White"></div><div class="card-foot"><span class="card-lbl">Flat White</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="coffee_mocha.jpg" alt="Mocha"></div><div class="card-foot"><span class="card-lbl">Mocha Latte</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="coffee_matcha.jpg" alt="Matcha"></div><div class="card-foot"><span class="card-lbl">Matcha Latte</span><div class="card-arr">→</div></div></div>
+    </div></div>
+    <div id="t-brunch" class="tab-panel"><div class="cards">
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="brunch_avo.jpg" alt="Avo Toast"></div><div class="card-foot"><span class="card-lbl">Avocado Toast</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="brunch_hotcakes.jpg" alt="Hotcakes"></div><div class="card-foot"><span class="card-lbl">Ricotta Hotcakes</span><div class="card-arr">→</div></div></div>
+      <div class="card" onclick="go('menu')"><div class="card-img"><img src="brunch_bigbreakfast.jpg" alt="Big Breakfast"></div><div class="card-foot"><span class="card-lbl">Big Brekkie</span><div class="card-arr">→</div></div></div>
+    </div></div>
+  </div>
+
+  <div class="gallery">
+    <div class="gal-item"><img src="1773487211361_image.jpg" alt="Tarts"></div>
+    <div class="gal-item"><img src="1773487256389_image.jpg" alt="Chocolate"></div>
+    <div class="gal-item"><img src="1773487246944_image.jpg" alt="Cakes"></div>
+    <div class="gal-item"><img src="1773487223215_image.jpg" alt="Pastry"></div>
+  </div>
+
+  <div class="craft">
+    <div class="craft-dark">
+      <p class="label">The Art of Baking</p>
+      <h2 class="title">Made Fresh,<br><em>Every Single Day</em></h2>
+      <p class="body-text">Our bakers rise before dawn to hand-craft every pastry, tart, and loaf from scratch.</p>
+      <div class="craft-feats">
+        <div class="feat"><div class="feat-icon">🌾</div><div><strong>Premium Local Ingredients</strong><span>Sourced fresh from Victorian farms daily</span></div></div>
+        <div class="feat"><div class="feat-icon">⏰</div><div><strong>72-Hour Croissant Process</strong><span>Slow-proofed for perfect laminated layers</span></div></div>
+        <div class="feat"><div class="feat-icon">❤️</div><div><strong>Made With Love</strong><span>Every recipe perfected over years</span></div></div>
+      </div>
+      <button class="btn-outline-w" onclick="go('menu')">See Full Menu →</button>
+    </div>
+    <div class="craft-img"><img src="1773487256389_image.jpg" alt="Chocolate treats"></div>
+  </div>
+
+  <div class="testi-sec">
+    <p class="label">What People Say</p>
+    <h2 class="title">Loved by Our Community</h2>
+    <div class="testi-grid">
+      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"The croissants are the best I've had outside of Paris. Perfectly flaky, buttery, and golden. I come every single morning."</p><div class="testi-who"><div class="testi-av">S</div><div><span class="testi-name">Sarah M.</span><span class="testi-role">Regular since 2019</span></div></div></div>
+      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"The tiramisu is extraordinary. You can taste the craft in every layer. Cozi Cafe feels like a little slice of Europe."</p><div class="testi-who"><div class="testi-av">J</div><div><span class="testi-name">James T.</span><span class="testi-role">Food blogger</span></div></div></div>
+      <div class="testi"><div class="stars">★★★★★</div><p class="testi-q">"The flat white is perfect every time. The team remembers my name. This place has a warmth you just can't manufacture."</p><div class="testi-who"><div class="testi-av">L</div><div><span class="testi-name">Lena K.</span><span class="testi-role">Local resident</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="ticker-warm"><div class="ticker-inner"><span>Follow @cozi.cafe on Instagram</span><span>Share your moments with #cozi.cafe</span><span>Tag us in your photos</span><span>We love seeing your visits</span><span>Follow @cozi.cafe on Instagram</span><span>Share your moments with #cozi.cafe</span><span>Tag us in your photos</span><span>We love seeing your visits</span></div></div>
+
+  <div class="footer-top">
+    <div class="f-brand"><div class="f-logo">☕ Cozi Cafe</div><p>A neighbourhood sanctuary where every morning begins with warmth, great coffee, and golden pastries.</p><div class="f-social"><a>📷</a><a>𝕗</a><a>📌</a></div></div>
+    <div class="f-col"><h4>Navigate</h4><ul><li><button onclick="go('home')">Home</button></li><li><button onclick="go('menu')">Menu</button></li><li><button onclick="go('about')">About</button></li><li><button onclick="go('contact')">Contact</button></li></ul></div>
+    <div class="f-col"><h4>Menu</h4><ul><li><button onclick="go('menu')">All-Day Brunch</button></li><li><button onclick="go('menu')">Pastries &amp; Sweets</button></li><li><button onclick="go('menu')">Coffee &amp; Drinks</button></li><li><button onclick="go('menu')">Seasonal Specials</button></li></ul></div>
+    <div class="f-col"><h4>Hours</h4><div class="f-hrs"><div class="f-hr"><span class="f-day">Mon–Thu</span><span class="f-time">7am–5pm</span></div><div class="f-hr"><span class="f-day">Fri–Sat</span><span class="f-time">7am–5:30pm</span></div><div class="f-hr"><span class="f-day">Sunday</span><span class="f-time">9am–3pm</span></div></div></div>
+  </div>
+  <div class="footer-bar"><span>© 2025 Cozi Cafe. All rights reserved.</span><span>Cozy Corner, VIC Australia</span></div>
+</div>
+
+<!-- ████ MENU ████ -->
+<div class="page" id="page-menu">
+  <div class="page-banner">
+    <img src="1773487211361_image.jpg" alt="Pastry decorating">
+    <div class="page-banner-inner"><p class="label">Our Menu</p><h1>Crafted with <em>Love &amp; Skill</em></h1></div>
+  </div>
+  <div class="menu-body">
+    <div class="menu-tabs">
+      <button class="mtab on" onclick="switchMtab(this,'mp-pastry')">🥐 Pastries</button>
+      <button class="mtab" onclick="switchMtab(this,'mp-coffee')">☕ Coffee</button>
+      <button class="mtab" onclick="switchMtab(this,'mp-brunch')">🍳 Brunch</button>
+    </div>
+
+    <!-- PASTRIES -->
+    <div id="mp-pastry" class="mpanel on">
+      <div class="mi"><img src="1773487223215_image.jpg" alt="Danish"><div class="mi-info"><div class="mi-name">Caramel Custard Danish</div><div class="mi-desc">Flaky puff pastry with silky caramel custard, baked golden</div><div class="mi-tags"><span class="mi-tag">Signature</span><span class="mi-tag">Vegetarian</span></div></div><div class="mi-price">$7.50</div></div>
+      <div class="mi"><img src="1773487246944_image.jpg" alt="Bundt"><div class="mi-info"><div class="mi-name">Mini Bundt Cakes</div><div class="mi-desc">Blueberry glaze, caramel drip, walnut cream — daily rotation</div><div class="mi-tags"><span class="mi-tag">Daily Fresh</span></div></div><div class="mi-price">$8.00</div></div>
+      <div class="mi"><img src="1773487256389_image.jpg" alt="Chocolate"><div class="mi-info"><div class="mi-name">Chocolate Almond Bites</div><div class="mi-desc">Dark chocolate glazed cookies &amp; bars with toasted almonds</div><div class="mi-tags"><span class="mi-tag">GF Option</span></div></div><div class="mi-price">$6.00</div></div>
+      <div class="mi"><img src="1773487287938_image.jpg" alt="Tiramisu"><div class="mi-info"><div class="mi-name">Classic Tiramisu</div><div class="mi-desc">Espresso-soaked ladyfingers, mascarpone cream, dusted cocoa</div><div class="mi-tags"><span class="mi-tag">Fan Favourite</span></div></div><div class="mi-price">$9.50</div></div>
+      <div class="mi"><img src="1773487211361_image.jpg" alt="Tarts"><div class="mi-info"><div class="mi-name">Signature Cream Tarts</div><div class="mi-desc">Buttery tart shells, whipped cream, fresh seasonal fruit</div><div class="mi-tags"><span class="mi-tag">Seasonal</span></div></div><div class="mi-price">$7.00</div></div>
+      <div class="mi"><img src="1773487317149_image.jpg" alt="Croissant"><div class="mi-info"><div class="mi-name">Butter Croissant</div><div class="mi-desc">Hand-laminated, 72-hour slow-proofed, perfectly golden &amp; flaky</div><div class="mi-tags"><span class="mi-tag">Best Seller</span></div></div><div class="mi-price">$5.50</div></div>
+    </div>
+
+    <!-- COFFEE — uses your uploaded images -->
+    <div id="mp-coffee" class="mpanel">
+      <div class="mi"><img src="coffee_flatwhite.jpg" alt="Flat White"><div class="mi-info"><div class="mi-name">Signature Flat White</div><div class="mi-desc">Double ristretto with velvety steamed whole milk microfoam</div><div class="mi-tags"><span class="mi-tag">House Blend</span></div></div><div class="mi-price">$5.00</div></div>
+      <div class="mi"><img src="coffee_mocha.jpg" alt="Mocha"><div class="mi-info"><div class="mi-name">Mocha Latte</div><div class="mi-desc">Espresso, rich dark chocolate, steamed milk, cocoa dust</div><div class="mi-tags"><span class="mi-tag">Popular</span></div></div><div class="mi-price">$6.00</div></div>
+      <div class="mi"><img src="coffee_caramel.jpg" alt="Caramel Latte"><div class="mi-info"><div class="mi-name">Salted Caramel Latte</div><div class="mi-desc">House-made caramel with espresso and steamed oat milk</div><div class="mi-tags"><span class="mi-tag">Seasonal</span></div></div><div class="mi-price">$6.50</div></div>
+      <div class="mi"><img src="coffee_matcha.jpg" alt="Matcha"><div class="mi-info"><div class="mi-name">Matcha Latte</div><div class="mi-desc">Ceremonial grade matcha whisked with steamed oat milk</div><div class="mi-tags"><span class="mi-tag">Vegan Option</span></div></div><div class="mi-price">$6.50</div></div>
+      <div class="mi"><img src="coffee_coldbrew.jpg" alt="Cold Brew"><div class="mi-info"><div class="mi-name">Cold Brew</div><div class="mi-desc">12-hour cold-extracted, served over ice with vanilla</div><div class="mi-tags"><span class="mi-tag">Iced</span></div></div><div class="mi-price">$7.00</div></div>
+      <div class="mi"><img src="coffee_chai.jpg" alt="Chai"><div class="mi-info"><div class="mi-name">Chai Latte</div><div class="mi-desc">House-blend spiced chai with steamed milk and honey</div><div class="mi-tags"><span class="mi-tag">Warming</span></div></div><div class="mi-price">$6.00</div></div>
+    </div>
+
+    <!-- BRUNCH — uses your uploaded images -->
+    <div id="mp-brunch" class="mpanel">
+      <div class="mi"><img src="brunch_avo.jpg" alt="Avo Eggs"><div class="mi-info"><div class="mi-name">Avocado &amp; Poached Eggs</div><div class="mi-desc">Smashed avo, poached eggs, sourdough, dukkah, chilli flakes</div><div class="mi-tags"><span class="mi-tag">Vegetarian</span><span class="mi-tag">Best Seller</span></div></div><div class="mi-price">$18.00</div></div>
+      <div class="mi"><img src="brunch_hotcakes.jpg" alt="Hotcakes"><div class="mi-info"><div class="mi-name">Ricotta Hotcakes</div><div class="mi-desc">Fluffy ricotta pancakes, honeycomb butter, berry compote</div><div class="mi-tags"><span class="mi-tag">Vegetarian</span></div></div><div class="mi-price">$19.00</div></div>
+      <div class="mi"><img src="brunch_bigbreakfast.jpg" alt="Big Breakfast"><div class="mi-info"><div class="mi-name">Big Breakfast Board</div><div class="mi-desc">Eggs your way, bacon, tomato, mushrooms, sourdough</div><div class="mi-tags"><span class="mi-tag">Filling</span></div></div><div class="mi-price">$22.00</div></div>
+      <div class="mi"><img src="brunch_frenchtoast.jpg" alt="French Toast"><div class="mi-info"><div class="mi-name">French Toast</div><div class="mi-desc">Brioche toast, mascarpone, seasonal compote, maple syrup</div><div class="mi-tags"><span class="mi-tag">Sweet</span></div></div><div class="mi-price">$17.00</div></div>
+    </div>
+  </div>
+
+  <div class="footer-top">
+    <div class="f-brand"><div class="f-logo">☕ Cozi Cafe</div><p>A neighbourhood sanctuary where every morning begins with warmth, great coffee, and golden pastries.</p><div class="f-social"><a>📷</a><a>𝕗</a><a>📌</a></div></div>
+    <div class="f-col"><h4>Navigate</h4><ul><li><button onclick="go('home')">Home</button></li><li><button onclick="go('menu')">Menu</button></li><li><button onclick="go('about')">About</button></li><li><button onclick="go('contact')">Contact</button></li></ul></div>
+    <div class="f-col"><h4>Hours</h4><div class="f-hrs"><div class="f-hr"><span class="f-day">Mon–Thu</span><span class="f-time">7am–5pm</span></div><div class="f-hr"><span class="f-day">Fri–Sat</span><span class="f-time">7am–5:30pm</span></div><div class="f-hr"><span class="f-day">Sunday</span><span class="f-time">9am–3pm</span></div></div></div>
+    <div class="f-col"><h4>Location</h4><ul><li><button>Cozy Corner VIC</button></li><li><button>hello@cozi.cafe</button></li></ul></div>
+  </div>
+  <div class="footer-bar"><span>© 2025 Cozi Cafe. All rights reserved.</span></div>
+</div>
+
+<!-- ████ ABOUT ████ -->
+<div class="page" id="page-about">
+  <div class="page-banner">
+    <img src="1773487317149_image.jpg" alt="Baker making croissants">
+    <div class="page-banner-inner"><p class="label">Our Story</p><h1>Where Every Visit Feels <em>Like Home</em></h1></div>
+  </div>
+  <div class="about-intro">
+    <div class="about-img"><img src="1773487211361_image.jpg" alt="Tarts being decorated"></div>
+    <div class="about-text">
+      <p class="label">Since 2018</p>
+      <h2 class="title">A Corner of Comfort</h2>
+      <p class="body-text">The Cozi Cafe was born from a simple belief: that great coffee and beautiful pastries have the power to make any day better. Founded in 2018 in Victoria, we set out to create a space where the morning ritual becomes a genuine moment of joy.</p>
+      <p class="body-text">Every recipe developed with care, every table chosen for comfort. This isn't just a cafe — it's your neighbourhood sanctuary.</p>
+      <button class="btn-gold" onclick="go('contact')">Visit Us Today →</button>
+    </div>
+  </div>
+  <div class="values-sec">
+    <p class="label">What Drives Us</p>
+    <h2 class="title">Our Values</h2>
+    <div class="v-grid">
+      <div class="v-card"><div class="v-icon">🌾</div><div class="v-title">Quality Ingredients</div><p class="v-desc">We source the finest local produce, single-origin coffee beans, and seasonal fruits — exceptional in every item on our menu.</p></div>
+      <div class="v-card"><div class="v-icon">🤝</div><div class="v-title">Warm Hospitality</div><p class="v-desc">We believe every customer deserves to feel welcome. Our team greets you not as a guest, but as a familiar friend returning home.</p></div>
+      <div class="v-card"><div class="v-icon">🎨</div><div class="v-title">Artisan Craft</div><p class="v-desc">From hand-laminated croissants to precision-piped tarts, every item is made with technique, patience, and genuine artistry.</p></div>
+    </div>
+  </div>
+  <div class="gallery">
+    <div class="gal-item"><img src="1773487287938_image.jpg" alt="Tiramisu"></div>
+    <div class="gal-item"><img src="1773487256389_image.jpg" alt="Chocolate"></div>
+    <div class="gal-item"><img src="1773487246944_image.jpg" alt="Cakes"></div>
+    <div class="gal-item"><img src="1773487223215_image.jpg" alt="Pastry"></div>
+  </div>
+  <div class="team-sec">
+    <p class="label">The People</p>
+    <h2 class="title">Meet Our Team</h2>
+    <div class="team-grid">
+      <div class="t-card"><div class="t-avatar">M</div><div class="t-name">Marco Bellini</div><div class="t-role">Head Pastry Chef</div><p class="t-bio">Trained in Lyon and Melbourne, Marco brings old-world technique and new-world creativity to every pastry.</p></div>
+      <div class="t-card"><div class="t-avatar">S</div><div class="t-name">Sophie Chen</div><div class="t-role">Head Barista</div><p class="t-bio">A coffee champion with an obsessive eye for extraction. Sophie ensures every cup is perfect, every time.</p></div>
+      <div class="t-card"><div class="t-avatar">A</div><div class="t-name">Anna Park</div><div class="t-role">Cafe Director</div><p class="t-bio">Anna runs front-of-house with infectious warmth and an uncanny ability to make every guest feel instantly at home.</p></div>
+    </div>
+  </div>
+  <div class="footer-top">
+    <div class="f-brand"><div class="f-logo">☕ Cozi Cafe</div><p>A neighbourhood sanctuary where every morning begins with warmth, great coffee, and golden pastries.</p><div class="f-social"><a>📷</a><a>𝕗</a><a>📌</a></div></div>
+    <div class="f-col"><h4>Navigate</h4><ul><li><button onclick="go('home')">Home</button></li><li><button onclick="go('menu')">Menu</button></li><li><button onclick="go('about')">About</button></li><li><button onclick="go('contact')">Contact</button></li></ul></div>
+    <div class="f-col"><h4>Hours</h4><div class="f-hrs"><div class="f-hr"><span class="f-day">Mon–Thu</span><span class="f-time">7am–5pm</span></div><div class="f-hr"><span class="f-day">Fri–Sat</span><span class="f-time">7am–5:30pm</span></div><div class="f-hr"><span class="f-day">Sunday</span><span class="f-time">9am–3pm</span></div></div></div>
+    <div class="f-col"><h4>Location</h4><ul><li><button>Cozy Corner VIC</button></li><li><button>hello@cozi.cafe</button></li></ul></div>
+  </div>
+  <div class="footer-bar"><span>© 2025 Cozi Cafe. All rights reserved.</span></div>
+</div>
+
+<!-- ████ CONTACT ████ -->
+<div class="page" id="page-contact">
+  <div style="padding-top:0">
+    <div class="contact-wrap">
+      <div class="contact-img-col">
+        <img src="1773487246944_image.jpg" alt="Cafe">
+        <div class="contact-overlay">
+          <div class="info-box"><div class="info-box-icon">📍</div><div><div class="info-lbl">Location</div><div class="info-val">Cozy Corner, VIC 00000, Australia</div></div></div>
+          <div class="info-box"><div class="info-box-icon">🕐</div><div><div class="info-lbl">Opening Hours</div><div class="info-val">Mon–Thu 7am–5pm · Fri–Sat 7am–5:30pm · Sun 9am–3pm</div></div></div>
+          <div class="info-box"><div class="info-box-icon">📞</div><div><div class="info-lbl">Phone</div><div class="info-val">+61 3 0000 0000</div></div></div>
+          <div class="info-box"><div class="info-box-icon">✉️</div><div><div class="info-lbl">Email</div><div class="info-val">hello@cozi.cafe</div></div></div>
+        </div>
+      </div>
+      <div class="contact-form-col">
+        <div class="c-logo"><div class="c-logo-mark">☕</div><span class="c-logo-text">Cozi Cafe</span></div>
+        <p class="label" style="margin-bottom:6px">Get In Touch</p>
+        <h2 class="title" style="font-size:30px;margin-bottom:24px">We'd Love to Hear<br>from <em>You</em></h2>
+        <form class="cform" id="cForm" onsubmit="submitForm(event)">
+          <div class="frow">
+            <div class="ff"><label>First Name</label><input type="text" placeholder="Jane" required></div>
+            <div class="ff"><label>Last Name</label><input type="text" placeholder="Smith" required></div>
+          </div>
+          <div class="ff"><label>Email</label><input type="email" placeholder="jane@example.com" required></div>
+          <div class="ff"><label>Phone</label><input type="tel" placeholder="+61 4xx xxx xxx"></div>
+          <div class="ff"><label>Subject</label><select><option>General Enquiry</option><option>Catering &amp; Events</option><option>Feedback</option><option>Wholesale</option><option>Press &amp; Media</option></select></div>
+          <div class="ff"><label>Message</label><textarea placeholder="How can we help you today?" required></textarea></div>
+          <button type="submit" class="submit-btn">Send Message →</button>
+        </form>
+        <div class="form-success" id="formOk">
+          <div style="font-size:48px">☕</div>
+          <p><strong>Thank you for reaching out!</strong><br>We'll get back to you within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-top">
+    <div class="f-brand"><div class="f-logo">☕ Cozi Cafe</div><p>A neighbourhood sanctuary where every morning begins with warmth, great coffee, and golden pastries.</p><div class="f-social"><a>📷</a><a>𝕗</a><a>📌</a></div></div>
+    <div class="f-col"><h4>Navigate</h4><ul><li><button onclick="go('home')">Home</button></li><li><button onclick="go('menu')">Menu</button></li><li><button onclick="go('about')">About</button></li><li><button onclick="go('contact')">Contact</button></li></ul></div>
+    <div class="f-col"><h4>Hours</h4><div class="f-hrs"><div class="f-hr"><span class="f-day">Mon–Thu</span><span class="f-time">7am–5pm</span></div><div class="f-hr"><span class="f-day">Fri–Sat</span><span class="f-time">7am–5:30pm</span></div><div class="f-hr"><span class="f-day">Sunday</span><span class="f-time">9am–3pm</span></div></div></div>
+    <div class="f-col"><h4>Location</h4><ul><li><button>Cozy Corner VIC</button></li><li><button>hello@cozi.cafe</button></li><li><button>+61 3 0000 0000</button></li></ul></div>
+  </div>
+  <div class="footer-bar"><span>© 2025 Cozi Cafe. All rights reserved.</span><span>Cozy Corner, VIC Australia</span></div>
+</div>
+
+<script>
+function go(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  document.getElementById('page-' + name).classList.add('show');
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  var nb = document.getElementById('n-' + name);
+  if (nb) nb.classList.add('active');
+  window.scrollTo(0, 0);
+}
+var mobOpen = false;
+function toggleMob() { mobOpen = !mobOpen; document.getElementById('mobile-nav').style.display = mobOpen ? 'flex' : 'none'; }
+function closeMob() { mobOpen = false; document.getElementById('mobile-nav').style.display = 'none'; }
+var si = 0;
+var slides = document.querySelectorAll('.slide');
+var dots = document.querySelectorAll('.dot');
+function goslide(n) { slides[si].classList.remove('on'); dots[si].classList.remove('on'); si = n; slides[si].classList.add('on'); dots[si].classList.add('on'); }
+setInterval(function() { goslide((si + 1) % slides.length); }, 5000);
+window.addEventListener('scroll', function() { var fb = document.getElementById('float-btn'); if (window.scrollY > 400) fb.classList.add('show'); else fb.classList.remove('show'); });
+function switchTab(btn, id) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('on')); document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on')); btn.classList.add('on'); document.getElementById(id).classList.add('on'); }
+function switchMtab(btn, id) { document.querySelectorAll('.mtab').forEach(t => t.classList.remove('on')); document.querySelectorAll('.mpanel').forEach(p => p.classList.remove('on')); btn.classList.add('on'); document.getElementById(id).classList.add('on'); }
+function submitForm(e) { e.preventDefault(); document.getElementById('cForm').style.display = 'none'; document.getElementById('formOk').style.display = 'block'; }
+</script>
+</body>
+</html>
